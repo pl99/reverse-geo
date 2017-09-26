@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/codingsince1985/geo-golang/openstreetmap"
+//	"github.com/codingsince1985/geo-golang/mapquest/open"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/magiconair/properties"
@@ -10,9 +11,11 @@ import (
 	"strings"
 )
 
+var osmGeocoder = openstreetmap.Geocoder()
+
 func reverseGeo(c echo.Context, lon float64, lat float64, ch chan myHandler) {
 	//Reverse Geocoding
-	address, err := geocoder.ReverseGeocode(lon, lat)
+	address, err := osmGeocoder.ReverseGeocode(lon, lat)
 	s := ""
 	if err == nil {
 		s = address.FormattedAddress
@@ -24,13 +27,14 @@ func reverseGeo(c echo.Context, lon float64, lat float64, ch chan myHandler) {
 	ch <- myHandler{s, err}
 }
 
-var geocoder = openstreetmap.Geocoder()
+
 
 //Health checking endpoint (similar springboot actuator)
 func health(c echo.Context) error {
 	r := &Ret{
 		Status: "Up",
 	}
+	//return c.String(http.StatusOK, "{\"Status\":\"Up\"}")
 	return c.JSON(http.StatusOK, r)
 }
 
